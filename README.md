@@ -32,7 +32,23 @@ This is a personal project and a work in progress — I'm actively building and 
 
 Loren is a single HTML file. Clone the repo and open `Loren.html` in a browser, or serve the folder locally for full PWA/manifest support:
 
+## Documentation
 
+The `docs/` folder has the full feature reference, converted from the original docs page into per-topic Markdown files:
+
+- [Panels](docs/panels.md) — the four main navigation panels
+- [Book Management](docs/book-management.md) — adding, editing, organizing, folders, duplicates, wishlist
+- [Reading Experience](docs/reading-experience.md) — PDF reader, session tracking, insights dashboard
+- [Discover](docs/discover.md) — mosaic and genre-shelf browsing
+- [Recall (Trivia)](docs/recall-trivia.md) — book trivia game and question types
+- [Loren AI](docs/loren-ai.md) — the built-in AI librarian
+- [Query Reference](docs/query-reference.md) — every query Loren understands, with examples and responses
+- [Proactive Notifications](docs/proactive-notifications.md) — moments where Loren speaks first
+- [Observations](docs/observations.md) — in-session behavioral asides
+- [Settings](docs/settings.md) — customization options
+- [Search](docs/search.md) — how the search bar behaves per panel
+
+  
 ## License
 
 Not yet decided, feel free to open an issue if you have thoughts.
