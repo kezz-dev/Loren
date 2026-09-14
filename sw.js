@@ -1,9 +1,9 @@
 // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 //  Loren Service Worker
-//  Change CACHE_VERSION whenever you update v6.html
+//  Change CACHE_VERSION whenever you update Loren.html
 //  so the SW picks up the new file immediately.
 // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
-const CACHE_VERSION  = 'Loren-r1';           // \u2190 bump this (e.g. v6-r2) after every update to v6.html
+const CACHE_VERSION  = 'Loren-r1';           // \u2190 bump this (e.g. Loren-r2) after every update to Loren.html
 const CACHE_NAME     = 'loren-' + CACHE_VERSION;
 const OFFLINE_URL    = './Loren.html';
 
