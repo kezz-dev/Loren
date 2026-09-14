@@ -1,8 +1,10 @@
-*Loren-Initiated Moments*
+*Contextual Prompts*
 
 # When Loren Speaks First
 
-Loren doesn't just respond — she notices things. When she has something worth saying, a dot appears on her button. Opening the chat, she leads with that observation. Each notification type has its own cooldown to avoid repetition.
+These are contextual prompts, not a notification feed. Loren uses local signals — library state, reading history, time of day — and only speaks first when something seems useful.
+
+A dot appears on the librarian button when a prompt is waiting. Opening chat shows it. Prompts are dismissible, rate-limited, and meant to stay quiet. Each type has its own cooldown so the app does not nag.
 
 - **👋 First Launch Welcome** [✓ Yes/No response armed]
   - Trigger: Very first time the app is opened. Fires once ever.

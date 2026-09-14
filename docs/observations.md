@@ -2,7 +2,9 @@
 
 # Silent Observations
 
-While you're chatting with Loren, she quietly notices patterns in your behavior and adds a short aside after certain responses — never intrusive, always optional. Each type is used at most once per session, and at least 3 messages must pass before another observation can appear.
+While you're chatting with Loren, it quietly notices patterns in your behavior and adds a short aside after certain responses — never intrusive, always optional. Each type is used at most once per session, and at least 3 messages must pass before another observation can appear.
+
+Observations are computed locally from library state and conversation context. They are not transmitted to a remote server.
 
 | Observation | Trigger | Example |
 | --- | --- | --- |

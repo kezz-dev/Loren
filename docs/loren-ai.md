@@ -1,8 +1,10 @@
-*AI Librarian*
+*Local NLP & Recommendation Engine*
 
 # Who Is Loren?
 
-Loren is Loren's built-in AI assistant — a personal librarian who knows your library, your reading history, your notes, and your patterns. Accessible via the 📚 button or by asking from within the reader.
+Loren is a local NLP and recommendation engine — a personal librarian that knows your library, your reading history, your notes, and your patterns. It runs in the browser. There is no remote language model and no server behind it.
+
+Accessible via the 📚 button or by asking from within the reader.
 
 - **🔍 Library Search & Filtering**: Finds books by genre, mood, length, author, or any keyword. Uses TF-IDF text scoring, genre mapping, and reading history to rank results. Shows up to 5 results (+ "show more" for the rest).
 - **🎯 Intelligent Recommendations**: Goes beyond keywords — uses your favorites, read history, fitness scoring, and genre diversity rotation to suggest books you're likely to enjoy but haven't opened yet.
@@ -11,4 +13,4 @@ Loren is Loren's built-in AI assistant — a personal librarian who knows your l
 - **⌨️ Typewriter Delivery**: Responses are typed out character by character — speed adjusts based on message length. Long-press the response bubble to stop generation early.
 - **✎ Edit & Resend**: Tap your own message bubble (or long-press on mobile) to reveal an Edit button. It removes that message and everything after it, puts the text back in the input, and lets you rephrase.
 
-> **TIP:** How Loren understands you: Every message is scored against 30+ possible intents (greeting, recommend, compare, read status, folder commands…). The highest-scoring intent wins. Loren also extracts genre, mood, length, author, and exclusions ("nothing too long", "not horror") before routing.
+> **TIP:** How Loren understands you: every message is scored against 30+ possible intents (greeting, recommend, compare, read status, folder commands…). The highest-scoring intent wins. Loren also extracts genre, mood, length, author, and exclusions ("nothing too long", "not horror") before routing. This is deterministic local classification and ranking, not a remote chatbot.

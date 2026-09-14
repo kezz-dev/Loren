@@ -13,6 +13,9 @@ Opening a book launches the built-in PDF reader. Loren quietly tracks your readi
 
 ### Reading Insights Dashboard
 
+These numbers are optional supporting information. They exist to help you notice your own reading, not to create streaks, scores, or pressure to keep pace.
+
+
 - **Total books & pages** — Total books in library, total pages read, read vs unread breakdown.
 - **Genre breakdown** — Horizontal bar chart of genres in your library and how many books belong to each.
 - **When you read** — Pie/bar breakdown of your reading sessions by time of day: morning / afternoon / evening / night.
