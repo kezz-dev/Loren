@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Loren</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1629">
+
+<!-- Fonts: Inter + Merriweather + Lora + Montserrat + Courier Prime -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Merriweather&family=Lora&family=Montserrat:wght@400;500&family=Courier+Prime&display=swap" rel="stylesheet">
+
+<!-- pdf.js (for text extraction) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+
+<link rel="stylesheet" href="css/app.css">
+
+</head>
+<body>
+
+
+  <!-- topbar -->
+  <div class="topbar" role="banner" id="topbarRoot">
+    <!-- Left-aligned title — shown while the icon row is expanded -->
+    <div class="title-left" id="titleLeft" title="Tap to hide shortcuts">
+      <div class="ai-badge" id="aiBadge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#faf6ee" stroke-width="1.6" stroke-linecap="round">
+          <circle cx="12" cy="9" r="4.2"/>
+          <path d="M4 19c1.6-2.6 4.6-4 8-4s6.4 1.4 8 4"/>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0;">
+        <span class="ai-wordmark" id="aiWordmarkLeft">Loren</span>
+        <span class="ai-greet-fade" id="aiGreetLeft"></span>
+      </div>
+    </div>
+
+    <!-- Centered title — shown while the icon row is collapsed -->
+    <div class="title-center" id="titleCenter" title="Tap to show shortcuts">
+      <span class="ai-wordmark ai-wordmark-center" id="aiWordmarkCenter">Loren</span>
+      <div class="ai-sub-stack">
+        <span class="ai-c-greet" id="aiCGreet"></span>
+        <span class="ai-c-date" id="aiCDate"></span>
+      </div>
+    </div>
+
+    <div class="top-actions" id="topActions">
+      <!-- Icon group — slides in/out -->
+      <div class="topbar-icon-group" id="topbarIconGroup">
+        <button id="insightsBtn" class="icon-btn" title="Reading Insights">📊</button>
+        <button id="digestBtn"   class="icon-btn" title="Your Week">📅</button>
+        <button id="allNotesBtn" class="icon-btn" title="My Notes">📝</button>
+        <button id="helpBtn"     class="icon-btn" title="Help">❓</button>
+        <button id="settingsBtn" class="icon-btn" title="Settings">⚙️</button>
+      </div>
+
+      <!-- Overflow trigger — only visible when collapsed -->
+      <button id="topbarOverflowBtn" class="topbar-overflow-trigger" title="Shortcuts">···</button>
+    </div>
+
+    <!-- First-run hint — shown once, ever, the first time the bar collapses -->
+    <div class="topbar-swipe-hint" id="topbarSwipeHint">swipe to show shortcuts →</div>
+  </div>
+
+<!-- Topbar overflow popover -->
+<div class="topbar-overflow-menu" id="topbarOverflowMenu">
+  <button class="tov-item" id="tovExpand">
+    <div class="tov-icon">↔</div>
+    <div class="tov-label">
+      <div class="tov-label-main">Show shortcuts</div>
+      <div class="tov-label-sub">Bring the icon row back</div>
+    </div>
+  </button>
+  <div class="tov-divider"></div>
+  <button class="tov-item" id="tovInsights">
+    <div class="tov-icon">📊</div>
+    <div class="tov-label">
+      <div class="tov-label-main">Reading Insights</div>
+      <div class="tov-label-sub">Stats, sessions, time spent</div>
+    </div>
+  </button>
+  <button class="tov-item" id="tovDigest">
+    <div class="tov-icon">📅</div>
+    <div class="tov-label">
+      <div class="tov-label-main">Your Week</div>
+      <div class="tov-label-sub">Weekly reading snapshot</div>
+    </div>
+  </button>
+  <button class="tov-item" id="tovNotes">
+    <div class="tov-icon">📝</div>
+    <div class="tov-label">
+      <div class="tov-label-main">All Notes</div>
+      <div class="tov-label-sub">Every note across your library</div>
+    </div>
+  </button>
+  <div class="tov-divider"></div>
+  <button class="tov-item" id="tovHelp">
+    <div class="tov-icon">❓</div>
+    <div class="tov-label">
+      <div class="tov-label-main">Replay Tour</div>
+      <div class="tov-label-sub">Walk through Loren again</div>
+    </div>
+  </button>
+  <div class="tov-divider"></div>
+  <button class="tov-item" id="tovSettings">
+    <div class="tov-icon">⚙️</div>
+    <div class="tov-label">
+      <div class="tov-label-main">Settings</div>
+      <div class="tov-label-sub">Theme, font, layout</div>
+    </div>
+  </button>
+</div>
+
+<!-- Selection mode topbar -->
+<div id="selectionTopbar" class="selection-topbar">
+  <div class="selection-title" id="selectionCount">0 selected</div>
+ <div class="selection-actions">
+  <button id="selectionSelectAllBtn" class="selection-btn">Select All</button>
+  <button id="selectionCreateFolderBtn" class="selection-btn">Create Folder</button>
+  <button id="selectionAddToFolderBtn" class="selection-btn">Add to...</button>
+  <button id="selectionMoveToFolderBtn" class="selection-btn" style="display:none;">Move to...</button>
+  <button id="selectionFavoriteBtn" class="selection-btn">Favorite</button> 
+  <button id="selectionMarkReadBtn" class="selection-btn">Mark Read</button>
+  <button id="selectionRemoveBtn" class="selection-btn">Remove</button>
+  <button id="selectionCancelBtn" class="selection-btn">Cancel</button>
+</div>
+</div>
+
+  <!-- Session indicator -->
+  <div id="sessionIndicator" class="session-indicator">
+    <span>Session</span>
+    <div class="session-books" id="sessionBooks"></div>
+    <button class="session-pause-btn" id="sessionPauseBtn" title="Pause/resume session">⏸</button>
+  </div>
+
+  <!-- small bar under topbar -->
+  <div class="small-bar" id="smallBar" role="region" aria-label="Library subtitle and count">
+    <!-- Default state -->
+    <div id="smallBarDefault" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+      <div class="subtitle">A refined space for your books</div>
+      <div class="book-count" id="bookCount">0 books</div>
+    </div>
+    <!-- Continue reading bar (injected by JS when eligible) -->
+    <div id="continueReadingBar" style="display:none;width:100%;">
+      <div class="continue-bar-row">
+        <div class="continue-bar-text">Continue <span class="continue-bar-title" id="continueBookTitle">…</span>?</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button class="continue-dismiss-btn" id="continueDismissBtn" title="Dismiss">✕</button>
+          <button class="continue-cta-btn" id="continueContinueBtn">Continue</button>
+        </div>
+      </div>
+      <div class="continue-ink-track">
+        <div class="continue-ink-fill" id="continueInkFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div class="main">
+
+ <!-- search + add -->
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+  <div style="position:relative;flex:1;">
+    <input id="searchInput" type="search" placeholder="Search books..." 
+  style="width:100%;padding:11px 44px 11px 16px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.08);background:var(--card);color:var(--text);font-size:14px;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:border-color 0.2s,box-shadow 0.2s;outline:none;">
+    <button id="createFolderQuickBtn" class="icon-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;padding:6px;cursor:pointer;font-size:18px;color:var(--muted);" title="Create folder">🗂️</button>
+  </div>
+  <button id="addBtn" class="btn">Add</button>
+  <input id="fileInputSingle" type="file" accept=".pdf" multiple style="display:none">
+  <input id="fileInputFolder" type="file" accept=".pdf" multiple webkitdirectory directory style="display:none">
+</div>
+
+    <!-- add menu -->
+    <div id="addMenu" class="add-menu" aria-hidden="true">
+      <button id="addSingleBtn">➕ Add single PDF</button>
+      <button id="addFolderBtn">📁 Add folder</button>
+    </div>
+    
+    <!-- Progress bar -->
+    <div id="uploadProgressContainer" style="display:none; margin:16px 0; padding:0 8px;">
+      <div id="progressTrack" style="background:#e5e7eb; border-radius:8px; overflow:hidden; height:8px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.1); transition:opacity 0.3s ease;">
+        <div id="progressBar" style="width:0%; height:100%; background:var(--accent); transition:width 0.6s ease; position:relative; overflow:hidden;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:13px; color:var(--muted);">
+        <div id="progressText" style="transition:opacity 0.15s ease;">Shelving...</div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button id="pauseUploadBtn" style="font-size:12px; padding:4px 10px; display:none; cursor:pointer; border:1px solid rgba(0,0,0,0.12); background:transparent; border-radius:6px; color:var(--muted); transition:all 0.15s;">
+            Pause
+          </button>
+          <button id="cancelUploadBtn" class="btn ghost" style="font-size:13px; padding:4px 10px; display:none; cursor:pointer;">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- library -->
+    <div id="libraryPanel" class="panel active">
+      <div id="libraryEmpty" style="display:none;" class="card">
+        <div style="padding:24px;text-align:center">
+          <div style="font-size:28px">📚</div>
+          <div style="font-weight:700;margin-top:8px">Your Library</div>
+          <div class="small" style="margin-top:6px;color:var(--muted)">Calm, private, and easy to use.</div>
+          <div style="margin-top:12px"><button id="emptyAdd" class="btn">Add books</button></div>
+        </div>
+      </div>
+      <div id="grid" class="grid" aria-live="polite"></div>
+    </div>
+
+   <div id="favoritesPanel" class="panel" style="display:none">
+  <div id="favoritesCountPill" style="display: none; background: var(--accent); color: white; padding: 6px 16px; border-radius: 99px; font-weight: 600; font-size: 13px; margin-bottom: 16px; width: fit-content;">❤️ 0</div>
+  <div id="favGrid" class="grid"></div>
+</div>
+
+    <div id="discoverPanel" class="panel" style="display:none">
+      <div id="recGrid"></div>
+      <div id="discoverMosaic"></div>
+    </div>
+
+    <!-- Mosaic genre sheet (global, outside panel so it can use fixed positioning) -->
+    <div class="dm-sheet-backdrop" id="dmSheetBackdrop" onclick="dmCloseSheet()"></div>
+    <div class="dm-sheet" id="dmSheet">
+      <div class="dm-sheet-handle"></div>
+      <div class="dm-sheet-header">
+        <div class="dm-sheet-genre" id="dmSheetGenre">Genre</div>
+        <div class="dm-sheet-count" id="dmSheetCount"></div>
+      </div>
+      <div class="dm-sheet-books" id="dmSheetBooks"></div>
+    </div>
+
+  </div>
+
+
+
+
+  <!-- floating librarian button -->
+  <button id="librarianBtn" class="librarian-btn">🧭</button>
+  
+ <!-- Ask Loren Modal (Conversational) -->
+<div id="assistantModal" class="assistant-modal" style="display:none">
+  <div class="chat-header">
+    <span id="chatHeaderTitle">Ask Loren</span>
+    <div class="trivia-score-bar" id="triviaScoreBar">
+      <span id="triviaScoreNum" class="trivia-score-num">0</span>
+      <span id="triviaScoreTotal" style="color:var(--muted);">/ 5</span>
+      <span style="margin-left:2px;font-size:11px;">correct</span>
+    </div>
+    <button id="endTriviaBtn" title="End game">End game</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="message loren">
+      <div class="message-bubble">Hi, I'm Loren. What are you looking for?<br><span class="message-examples">e.g., "a short fantasy", "recommend", "something inspiring"</span></div>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="chatInput" placeholder="Type your request...">
+    <button id="sendChatBtn" class="btn">Ask</button>
+  </div>
+  <div class="chat-suggestions" id="chatSuggestions"></div>
+</div>
+
+<!-- ══ In-App PDF Reader ══════════════════════════════════════════ -->
+<div id="readerModal" style="display:none">
+
+  <!-- Top bar — title + author + layout + mode + TOC -->
+  <div class="reader-topbar" id="readerTopbar">
+    <button class="reader-icon-btn" id="readerCloseBtn" title="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="reader-topbar-center">
+      <div class="reader-title" id="readerTitle"></div>
+      <div class="reader-author" id="readerAuthor"></div>
+    </div>
+    <!-- Layout: vertical = stacked lines, horizontal = side pages -->
+    <button class="reader-icon-btn" id="readerLayoutBtn" title="Toggle scroll direction">
+      <svg id="readerLayoutIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+    </button>
+    <button class="reader-icon-btn" id="readerModeBtn" title="Toggle reading mode">☀️</button>
+    <!-- TOC — far right -->
+    <button class="reader-icon-btn" id="readerTocBtn" title="Table of contents">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Full-screen canvas — the page -->
+  <div class="reader-canvas-wrap" id="readerCanvasWrap">
+    <canvas id="readerCanvas"></canvas>
+    <div class="reader-text-layer" id="readerTextLayer"></div>
+    <!-- Tap zone overlay — catches taps on the reading surface -->
+    <div class="reader-tap-zone" id="readerTapZone"></div>
+  </div>
+
+  <!-- Loren FAB — bottom right, outside bottombar flow -->
+  <button class="reader-loren-fab" id="readerLorenFab" title="Ask Loren">🧭</button>
+  <div class="reader-page-bar" id="readerPageBar">
+    <div class="reader-page-pill rpb-hidden" id="readerPagePill"></div>
+  </div>
+
+  <!-- Word definition panel -->
+  <div class="reader-define-panel" id="readerDefinePanel">
+    <div class="reader-define-header">
+      <span class="reader-define-word" id="readerDefineWord"></span>
+      <button class="reader-icon-btn reader-define-close" id="readerDefinePanelClose">✕</button>
+    </div>
+    <div class="reader-define-body" id="readerDefineBody"></div>
+  </div>
+
+  <!-- Table of contents panel — slides in from right -->
+  <div class="reader-toc-panel" id="readerTocPanel">
+    <div class="reader-toc-header">
+      <span class="reader-toc-title">Contents</span>
+      <button class="reader-icon-btn" id="readerTocClose">✕</button>
+    </div>
+    <div class="reader-toc-list" id="readerTocList">
+      <div class="reader-toc-empty">No chapters found in this PDF.</div>
+    </div>
+  </div>
+  <div class="reader-toc-backdrop" id="readerTocBackdrop"></div>
+
+</div>
+
+<!-- Cinematic Tour -->
+<!-- ── Welcome splash (first-time only) ── -->
+<div id="lorenWelcomeSplash">
+  <div class="ws-dot-wrap"><div class="ws-dot"></div></div>
+  <div class="ws-greeting" id="wsGreeting">Welcome.</div>
+  <div class="ws-sub">Glad you're here.</div>
+  <div class="ws-divider"></div>
+  <div class="ws-body">
+    Loren is your personal library —<br>
+    every book you bring in lives right here,<br>
+    <strong>safe in your hands, always with you.</strong>
+  </div>
+  <div class="ws-tap">Tap anywhere to begin</div>
+</div>
+
+<!-- ── Tour closing card (first-time only) ── -->
+<div id="lorenTourClosing">
+  <div class="tc-rule"></div>
+  <div class="tc-emblem">📚</div>
+  <div class="tc-title">You're all set.</div>
+  <div class="tc-body">
+    Ready when you are —<br>
+    add your books, ask questions,<br>
+    get lost in something good.
+  </div>
+  <button class="tc-btn" id="tcOpenBtn">Continue →</button>
+</div>
+
+
+
+<div id="ctourBlocker"></div>
+<div id="ctourSpotlight"></div>
+<div id="ctourCard">
+  <div class="ctour-step-label" id="ctourStepLabel">Step 1 of 7</div>
+  <div class="ctour-title" id="ctourTitle"></div>
+  <div class="ctour-body" id="ctourBody"></div>
+  <div class="ctour-progress-track"><div class="ctour-progress-fill" id="ctourProgressFill" style="width:0%"></div></div>
+ <div class="ctour-footer">
+  <button class="ctour-prev-btn" id="ctourPrev" style="display:none;">← Previous</button>
+  <button class="ctour-skip-btn" id="ctourSkip">Skip tour</button>
+  <button class="ctour-next-btn" id="ctourNext">Got it →</button>
+</div>
+</div>
+
+
+  <!-- tour elements -->
+  <div id="tourHighlight" class="tour-highlight" style="display:none"></div>
+  <div id="tourOverlay" class="tour-overlay" style="display:none"></div>
+  <div id="tourTooltip" style="display:none"></div>
+
+  
+  <!-- editor modal -->
+  <div id="editorModal" class="editor-modal" style="display:none">
+    <div class="editor-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div id="editorTitle" style="font-weight:700">Edit Book</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="editorGenres" style="padding:6px;border-radius:8px">
+            <option value="">Detected genres</option>
+          </select>
+          <button id="exportTextBtn" class="btn ghost">Export</button>
+          <button id="closeEditorBtn" class="btn">Close</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button data-cmd="bold" class="btn ghost">B</button>
+        <button data-cmd="italic" class="btn ghost">I</button>
+        <button data-cmd="underline" class="btn ghost">U</button>
+        <select id="fontSelect" style="margin-left:auto;padding:8px;border-radius:8px;">
+          <option value="sans">Sans</option>
+          <option value="serif">Serif</option>
+          <option value="mono">Mono</option>
+        </select>
+      </div>
+      <div id="editorArea" class="editor-area" contenteditable="true" spellcheck="true"></div>
+    </div>
+  </div>
+
+  <!-- Notes & Quotes modal -->
+<div id="notesModal" class="notes-modal" style="display:none">
+    <div class="notes-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-weight:700" id="notesTitle">Notes & Quotes</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="exportNotesPdfBtn" class="btn ghost" title="Export notes as PDF" style="font-size:12px;">⬇ PDF</button>
+          <button id="closeNotesBtn" class="btn">Close</button>
+        </div>
+      </div>
+      <input type="search" id="notesSearch" class="notes-search" placeholder="Search notes…" style="display:none;">
+      <div id="notesList"></div>
+      <div style="border-top:1px solid rgba(0,0,0,0.08);padding-top:12px;" id="noteAddArea">
+        <!-- Note/Quote type toggle -->
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <button id="noteTypeNote" class="note-type-btn active" data-type="note">Note</button>
+          <button id="noteTypeQuote" class="note-type-btn" data-type="quote">Quote</button>
+        </div>
+        <textarea id="newNoteText" placeholder="Add a note about this book..." style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);min-height:80px;margin-bottom:8px;box-sizing:border-box;background:var(--bg);color:var(--text);font-size:14px;resize:vertical;"></textarea>
+        <!-- Quote author field — shown only when Quote is selected -->
+        <input id="newQuoteAuthor" type="text" placeholder="Quote by (optional)…" style="display:none;width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-bottom:8px;box-sizing:border-box;background:var(--bg);color:var(--text);font-size:13px;font-style:italic;">
+        <div id="newNotePendingTags" class="note-tags-row"></div>
+        <div class="note-tag-input-row" id="noteTagSuggestRow"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+          <button id="saveNoteBtn" class="btn">Save Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book detail modal -->
+  <div id="bookDetailModal" class="book-detail-modal" style="display:none">
+    <div class="book-detail-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700" id="bookDetailTitle">Book Details</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="closeBookDetailBtn" class="btn">Close</button>
+        </div>
+      </div>
+      <div class="book-detail-cover" id="bookDetailCover">📘</div>
+      <div style="font-weight:700;font-size:18px;" id="bookDetailName"></div>
+    <div style="color:var(--muted);margin-bottom:16px;" id="bookDetailAuthor"></div>
+    
+<div class="book-detail-actions">
+  <button class="book-action-btn" id="bookDetailOpen">
+    <span style="font-size:12px">📖</span> Open
+  </button>
+  <button class="book-action-btn" id="bookDetailDownload">
+    <span style="font-size:12px">🔻</span> Download PDF
+  </button>
+  <button class="book-action-btn" id="bookDetailEdit">
+    <span style="font-size:12px">✒️</span> Edit text
+  </button>
+  <button class="book-action-btn" id="bookDetailSimilar">
+    <span style="font-size:12px">✦</span> Find Similar
+  </button>
+  <button class="book-action-btn" id="bookDetailMarkRead">
+    <span style="font-size:12px" id="bookDetailReadIcon">○</span> <span id="bookDetailReadLabel">Mark as read</span>
+  </button>
+</div>
+      
+      <div class="book-tabs">
+        <div class="book-tab active" data-tab="content">Content</div>
+        <div class="book-tab" data-tab="notes">Notes & Quotes</div>
+        <div class="book-tab" data-tab="info">Info</div>
+      </div>
+      
+      <div class="book-content" id="bookContentTab">
+        <div id="bookContentText"></div>
+      </div>
+      
+      <div class="book-content" id="bookNotesTab" style="display:none">
+        <div id="bookNotesList"></div>
+        <div style="margin-top:12px;border-top:1px solid rgba(0,0,0,0.08);padding-top:12px;">
+          <!-- Note/Quote type toggle -->
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <button id="bookNoteTypeNote" class="note-type-btn active" data-type="note">Note</button>
+            <button id="bookNoteTypeQuote" class="note-type-btn" data-type="quote">Quote</button>
+          </div>
+          <textarea id="bookNewNoteText" placeholder="Add a note about this book..." style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);min-height:60px;margin-bottom:8px;background:var(--bg);color:var(--text);font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>
+          <!-- Quote author field — shown only when Quote is selected -->
+          <input id="bookNewQuoteAuthor" type="text" placeholder="Quote by (optional)…" style="display:none;width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-bottom:8px;box-sizing:border-box;background:var(--bg);color:var(--text);font-size:13px;font-style:italic;">
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="bookSaveNoteBtn" class="btn">Save Note</button>
+          </div>
+        </div>
+        <!-- Similar books section -->
+        <div id="bookSimilarSection" style="margin-top:20px;border-top:1px solid rgba(0,0,0,0.08);padding-top:16px;display:none;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Also in your library</div>
+          <div id="bookSimilarList"></div>
+        </div>
+      </div>
+      
+      <div class="book-content" id="bookInfoTab" style="display:none">
+        <div style="margin-bottom:8px;"><strong>Added:</strong> <span id="bookInfoDate"></span></div>
+        <div style="margin-bottom:8px;"><strong>File:</strong> <span id="bookInfoFile"></span></div>
+        <div style="margin-bottom:8px;"><strong>Length:</strong> <span id="bookInfoLength"></span></div>
+        <div style="margin-bottom:8px;"><strong>Genres:</strong> <span id="bookInfoGenres"></span></div>
+        <div style="margin-bottom:8px;display:none;" id="bookInfoYearRow"><strong>Published:</strong> <span id="bookInfoYear"></span></div>
+        <div style="margin-bottom:8px;display:none;" id="bookInfoPubRow"><strong>Publisher:</strong> <span id="bookInfoPublisher"></span></div>
+        <div style="margin-bottom:8px;display:none;" id="bookInfoSeriesRow"><strong>Series:</strong> <span id="bookInfoSeries"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Folder multi-select action bar -->
+  <!-- Folder multi-select topbar — mirrors book selectionTopbar -->
+  <div id="folderMultiBar" class="selection-topbar" style="display:none;">
+    <div class="selection-title" id="fmbCount">0 folders</div>
+    <div class="selection-actions">
+      <button class="selection-btn" id="fmbSelectAll">📋 All</button>
+      <button class="selection-btn" id="fmbRename" style="display:none;">✏️ Rename</button>
+      <button class="selection-btn" id="fmbRecolor">🎨 Recolor</button>
+      <button class="selection-btn" id="fmbPin">📌 Pin</button>
+      <button class="selection-btn" id="fmbMerge">🔗 Merge</button>
+      <button class="selection-btn" id="fmbDelete" style="color:#e53e3e;">🗑 Delete</button>
+      <button class="selection-btn" id="fmbCancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Folder merge modal -->
+  <div id="folderMergeModal">
+    <div class="folder-merge-panel">
+      <h3>Merge folders</h3>
+      <div class="hint" id="fmbMergeHint">All books will be combined into one folder.</div>
+      <div class="folder-merge-name-row">
+        <input id="fmbMergeName" placeholder="New folder name" />
+      </div>
+      <div class="folder-merge-actions">
+        <button class="selection-btn" style="background:transparent;color:var(--text);border-color:rgba(0,0,0,0.1);" id="fmbMergeCancel">Cancel</button>
+        <button class="btn" id="fmbMergeConfirm">Merge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Folder creation modal -->
+  <div id="folderModal" class="folder-modal" style="display:none">
+    <div class="folder-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700">Create Folder</div>
+        <div style="display:flex;gap:8px;align-items:center">
+       <button id="closeFolderBtn" class="selection-btn" style="background:transparent;color:var(--text);border-color:rgba(0,0,0,0.1);">Cancel</button>
+        </div>
+      </div>
+      <div>
+  <label style="display:block;margin-bottom:6px;font-weight:500;">Folder Name</label>
+  <input id="folderNameInput" placeholder="e.g., Philosophy, Fiction, To Read" 
+         style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-bottom:12px;transition:border-color 0.2s ease, box-shadow 0.2s ease;"
+         onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 2px rgba(10,22,41,0.1)'"
+         onblur="this.style.borderColor='';this.style.boxShadow=''">
+</div>
+      <div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <label style="font-weight:500;">Color</label>
+    <select id="folderPaletteSelect" style="font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);background:var(--bg);color:var(--text);cursor:pointer;font-family:var(--font-sans);outline:none;">
+      <option value="foundry">Foundry — metallic</option>
+      <option value="gallery">Gallery — vivid</option>
+      <option value="dusk">Dusk — matte</option>
+      <option value="manuscript">Manuscript — warm ink</option>
+      <option value="carbon">Carbon — near-black</option>
+    </select>
+  </div>
+  <div class="color-options" id="folderColorOptions">
+    <div class="color-option selected" data-color="#0a1629"></div>
+    <div class="color-option" data-color="#4a6fa5"></div>
+    <div class="color-option" data-color="#667761"></div>
+    <div class="color-option" data-color="#8c5e58"></div>
+    <div class="color-option" data-color="#9c6b98"></div>
+    <div class="color-option" data-color="#3a8b8f"></div>
+    <div class="color-option" data-color="#d4a574"></div>
+    <div class="color-option" data-color="#c44536"></div>
+    <div class="color-option" data-color="#6a0572"></div>
+    <div class="color-option" data-color="#b05c2a"></div>
+    <div class="color-option" data-color="#e9c46a"></div>
+    <div class="color-option" data-color="#2d5a27"></div>
+  </div>
+</div>
+      <div style="margin-top:12px;">
+        <label style="display:block;margin-bottom:6px;font-weight:500;">Books in this folder: <span id="folderBookCount">0</span></label>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Selected books will be grouped together visually.</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button id="createFolderBtn" class="btn">Create Folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- settings panel -->
+  <div id="settingsPanel" class="settings-panel" style="display:none">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid rgba(128,128,128,0.1);margin-bottom:12px;">
+      <span style="font-weight:700;font-size:15px;letter-spacing:0.01em">Settings</span>
+      <button id="closeSettingsSmall" class="icon-btn" style="font-size:14px;opacity:0.5">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="settings-tabs">
+      <button class="settings-tab active" data-tab="appearance">Appearance</button>
+      <button class="settings-tab" data-tab="library">Library</button>
+      <button class="settings-tab" data-tab="data">Data</button>
+    </div>
+
+    <!-- APPEARANCE TAB -->
+    <div class="settings-tab-panel active" id="stab-appearance">
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Dark mode</span>
+        </div>
+        <label class="toggle-switch"><input id="darkToggle" type="checkbox"><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Warm Night</span>
+          <span class="setting-hint">Amber tones</span>
+        </div>
+        <label class="toggle-switch"><input id="warmNightToggle" type="checkbox"><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:0;">
+        <span class="setting-label" style="margin-bottom:2px;">Colour finish</span>
+        <div class="palette-grid" id="paletteSwitcher">
+          <!-- Foundry — metallic shimmer -->
+          <div class="palette-swatch active" data-palette="foundry">
+            <div class="palette-swatch-dots">
+              <div class="palette-dot" style="background:linear-gradient(145deg,#16243a,#4a6080,#16243a)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#2a5c60,#5e9498,#2a5c60)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#503256,#866a8a,#503256)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#5a2018,#9a4a3a,#5a2018)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#6a3210,#c07040,#6a3210)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#1a3a14,#4a7a3e,#1a3a14)"></div>
+            </div>
+            <span class="palette-swatch-label">Foundry</span>
+          </div>
+          <!-- Gallery — vivid -->
+          <div class="palette-swatch" data-palette="gallery">
+            <div class="palette-swatch-dots">
+              <div class="palette-dot" style="background:linear-gradient(135deg,#0a1629,#1a2b4a)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#3a8b8f,#4da0a4)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#9c6b98,#b080ac)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#c44536,#d85a4b)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#b05c2a,#d0783e)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#2d5a27,#3e7a36)"></div>
+            </div>
+            <span class="palette-swatch-label">Gallery</span>
+          </div>
+          <!-- Dusk — matte -->
+          <div class="palette-swatch" data-palette="dusk">
+            <div class="palette-swatch-dots">
+              <div class="palette-dot" style="background:#394655"></div>
+              <div class="palette-dot" style="background:#557c82"></div>
+              <div class="palette-dot" style="background:#7a6a80"></div>
+              <div class="palette-dot" style="background:#8a5550"></div>
+              <div class="palette-dot" style="background:#8a6050"></div>
+              <div class="palette-dot" style="background:#4a6a44"></div>
+            </div>
+            <span class="palette-swatch-label">Dusk</span>
+          </div>
+          <!-- Manuscript — warm ink -->
+          <div class="palette-swatch" data-palette="manuscript">
+            <div class="palette-swatch-dots">
+              <div class="palette-dot" style="background:linear-gradient(135deg,#2a1f14,#3d3020)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#3a6658,#507a6e)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#6e4c5a,#8e6470)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#8a2e20,#b04438)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#8a3a10,#b05a28)"></div>
+              <div class="palette-dot" style="background:linear-gradient(135deg,#1e4018,#326430)"></div>
+            </div>
+            <span class="palette-swatch-label">Manuscript</span>
+          </div>
+          <!-- Carbon — near-black -->
+          <div class="palette-swatch" data-palette="carbon">
+            <div class="palette-swatch-dots">
+              <div class="palette-dot" style="background:linear-gradient(145deg,#111418,#202832,#111418)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#161e20,#22282a,#161e20)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#1e1820,#2c2430,#1e1820)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#201412,#302018,#201412)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#1e1410,#2c1e16,#1e1410)"></div>
+              <div class="palette-dot" style="background:linear-gradient(145deg,#121814,#1e2820,#121814)"></div>
+            </div>
+            <span class="palette-swatch-label">Carbon</span>
+          </div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Font</span>
+        <select id="uiFont" class="setting-select">
+          <option value="merriweather">Merriweather</option>
+          <option value="lora">Lora</option>
+          <option value="mont">Montserrat</option>
+          <option value="courier">Courier Prime</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Animations</span>
+        <label class="toggle-switch"><input id="animationToggle" type="checkbox" checked><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Lock navigation bar</span>
+          <span class="setting-hint">Keep bar visible, disable scroll-hide</span>
+        </div>
+        <label class="toggle-switch"><input id="navLockToggle" type="checkbox"><span class="toggle-track"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Cover textures</span>
+          <span class="setting-hint">Replace plain title pages</span>
+        </div>
+        <label class="toggle-switch"><input id="coverTextureToggle" type="checkbox" checked><span class="toggle-track"></span></label>
+      </div>
+    </div>
+
+    <!-- LIBRARY TAB -->
+    <div class="settings-tab-panel" id="stab-library">
+      <div class="setting-row">
+        <span class="setting-label">Grid layout</span>
+        <select id="gridLayoutSelect" class="setting-select">
+          <option value="1">List</option>
+          <option value="2">Grid</option>
+          <option value="3">Shelf</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Session length</span>
+          <span class="setting-hint">minutes</span>
+        </div>
+        <input id="sessionLengthInput" type="number" min="5" max="240" class="setting-input">
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Sort books by</span>
+        <select id="sortSelect" class="setting-select">
+          <option value="import">Recently added</option>
+          <option value="alpha">Title A → Z</option>
+          <option value="author">Author A → Z</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Sort folders by</span>
+        <select id="folderSortSelect" class="setting-select">
+          <option value="added">Recently added</option>
+          <option value="author">Name A → Z</option>
+          <option value="color">Color</option>
+        </select>
+      </div>
+      <!-- hidden radios kept for JS compatibility -->
+      <input type="radio" name="sortOrder" value="import" id="sortImport" style="display:none">
+      <input type="radio" name="sortOrder" value="alpha"  id="sortAlpha"  style="display:none">
+      <input type="radio" name="sortOrder" value="author" id="sortAuthor" style="display:none">
+    </div>
+
+    <!-- DATA TAB -->
+    <div class="settings-tab-panel" id="stab-data">
+      <div class="setting-row">
+        <span class="setting-label">Save Library</span>
+        <button id="exportLibraryBtn" class="setting-action-btn">🗃️&thinsp;&thinsp;…</button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Save Notes</span>
+        <button id="exportNotesBtn" class="setting-action-btn">📑&thinsp;&thinsp;…</button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Add Library</span>
+        <button id="importLibraryBtn" class="setting-action-btn">📁&thinsp;&thinsp;…</button>
+        <input id="importLibraryInput" type="file" accept=".json" style="display:none">
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Duplicates</span>
+        <button id="reviewDuplicatesBtn" class="setting-action-btn">🔎&thinsp;&thinsp;…</button>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(128,128,128,0.08);display:flex;gap:8px;">
+        <button id="resetNamesBtn" class="btn ghost" style="flex:1;justify-content:center;font-size:12px;">Reset names</button>
+        <button id="resetAppBtn"   class="btn ghost" style="flex:1;justify-content:center;font-size:12px;">Reset app</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+
+      </div>
+    </div>
+
+    <!-- Save — always visible -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(128,128,128,0.1);">
+      <button id="saveSettingsBtn" class="btn" style="width:100%;justify-content:center;">Save settings</button>
+    </div>
+
+  </div>
+  
+
+
+<!-- onboarding modal -->
+<div id="onboardModal" class="onboard-modal" style="display:none">
+  <div class="onboard-panel" id="onboardPanel">
+    <div class="onboard-step" id="onboardStep1">
+      <h2 style="margin:0 0 8px 0">Welcome to your library</h2>
+      <p style="margin:0 0 12px 0;color:var(--muted);line-height:1.5">This is a calm space for your reading. Everything stays on your device — no accounts, no tracking, no distractions.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+        <button id="skipOnboard" class="btn ghost">Skip</button>
+        <button class="btn next-onboard">Continue</button>
+      </div>
+    </div>
+    <div class="onboard-step" id="onboardStep2" style="display:none">
+      <h2 style="margin:0 0 8px 0">Ownership & privacy</h2>
+      <p style="margin:0 0 12px 0;color:var(--muted);line-height:1.5">Your books, notes, and reading sessions are stored locally. You own everything here. No one else can see your library.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+        <button class="btn ghost prev-onboard">Back</button>
+        <button class="btn next-onboard">Continue</button>
+      </div>
+    </div>
+    <div class="onboard-step" id="onboardStep3" style="display:none">
+      <h2 style="margin:0 0 8px 0">Optional preferences</h2>
+      <div style="margin:0 0 12px 0;color:var(--muted);line-height:1.5">
+        <div style="margin-bottom:10px;">
+          <label style="display:block;margin-bottom:4px;">Your name (optional)</label>
+          <input id="onboardUser" placeholder="For personalization" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;margin-bottom:4px;">Librarian name (optional)</label>
+          <input id="onboardAI" placeholder="Loren" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;margin-bottom:4px;">Preferred session length (minutes)</label>
+          <input id="onboardSessionLength" type="number" min="5" max="240" placeholder="Optional" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+        <button class="btn ghost prev-onboard">Back</button>
+        <button id="saveOnboard" class="btn">Begin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- bottom nav -->
+  <div class="bottomnav" role="navigation" aria-label="Main navigation">
+  <div class="nav-item active" id="navLibrary">📖<div style="font-size:15px">Library</div></div>
+    <div class="nav-item" id="navFavorites">❤️<div style="font-size:15px">Favorites</div></div>
+    <div class="nav-item" id="navDiscover">🏛️<div style="font-size:15px">Discover</div></div>
+    <div class="nav-item" id="navGames">⏳<div style="font-size:15px">Recall</div></div>
+  </div>
+
+
+<!-- Loren confirm dialog -->
+  <div class="loren-confirm-overlay" id="lorenConfirmOverlay">
+    <div class="loren-confirm-sheet">
+      <div class="loren-confirm-handle"></div>
+      <div class="loren-confirm-label">✦ Loren</div>
+      <div class="loren-confirm-bubble" id="lorenConfirmMsg"></div>
+      <div class="loren-confirm-actions">
+        <button class="loren-confirm-cancel" id="lorenConfirmCancel">Cancel</button>
+        <button class="loren-confirm-ok" id="lorenConfirmOk">Yes, go ahead</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Games sheet -->
+  <div class="games-sheet-overlay" id="gamesSheetOverlay">
+    <div class="games-sheet" id="gamesSheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div class="games-sheet-title">⏳ Recall</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="modal-help-btn" id="gamesHelpBtn" title="How Recall works">?</button>
+          <button id="gamesSheetClose" style="background:none;border:0;font-size:18px;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:8px;">✕</button>
+        </div>
+      </div>
+      <div class="games-sheet-sub" id="gamesSheetSub">All games are run by Loren — just talk to her.</div>
+      <div class="game-card" id="startTriviaBtn">
+        <div class="game-card-icon">📖</div>
+        <div>
+          <div class="game-card-title">Book Trivia</div>
+          <div class="game-card-desc">Test your knowledge on any book in your library. Easy, Medium, or Hard.</div>
+        </div>
+      </div>
+      <div class="game-card" id="startWordHuntBtn">
+        <div class="game-card-icon">🔤</div>
+        <div>
+          <div class="game-card-title">Word Hunt</div>
+          <div class="game-card-desc">A real sentence from your book, one word missing. Can you find it?</div>
+        </div>
+      </div>
+      <div class="game-card" id="startMatchQuoteBtn">
+        <div class="game-card-icon">🃏</div>
+        <div>
+          <div class="game-card-title">Match the Quote</div>
+          <div class="game-card-desc">A real passage from one of your books — which one is it from?</div>
+        </div>
+      </div>
+      <div class="game-card" id="startAuthorArenaBtn">
+        <div class="game-card-icon">🏟️</div>
+        <div>
+          <div class="game-card-title">Author's Arena</div>
+          <div class="game-card-desc">A book title appears — four author names step forward. Only one wrote it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <!-- footer -->
+  <div class="footer-text" id="footerText">
+    Loren — built to keep your books organized and accessible.
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast"></div>
+  
+  <!-- bottom nav handle - always visible -->
+<div id="bottomNavHandle" class="bottom-nav-handle"></div>
+
+
+<script src="js/storage.js"></script>
+<script src="js/state.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/library.js"></script>
+<script src="js/reader.js"></script>
+<script src="js/recall.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/loren-ai.js"></script>
+<script src="js/app.js"></script>
+
+<!-- FIRST STATIC SPLASH -->
+<div id="lorenInitialSplash" class="initial-splash">
+  <div class="initial-splash-card">
+    <!-- LOREN ICON — cream mark only, card vessel is the dark bg -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="75%" height="75%"
+         viewBox="312 300 398 400"
+         preserveAspectRatio="xMidYMid meet"
+         style="display:block;flex-shrink:0;">
+
+      <!-- left stroke depth -->
+      <path fill="#1C2D46"
+        transform="translate(273,344)"
+        d="M0 0 C2.50816143 3.80791444 2.27388583 7.682102 2.24050903 12.0737915 C2.24221788 12.89391968 2.24392673 13.71404785 2.24568737 14.55902839 C2.24898493 17.31059964 2.23797417 20.06192772 2.22705078 22.81347656 C2.22648673 24.7844848 2.22680312 26.75549347 2.22793579 28.72650146 C2.22851052 34.0815024 2.2167367 39.43641407 2.20278788 44.79139423 C2.1903006 50.38613243 2.1891116 55.98087258 2.18673706 61.57562256 C2.1805164 72.17196654 2.16409764 82.76826934 2.14403808 93.36459517 C2.12169732 105.42733055 2.11069024 117.49006787 2.10064721 129.55281878 C2.07973194 154.3685687 2.04454457 179.18428204 2 204 C1.67 204 1.34 204 1 204 C0.67 238.98 0.34 273.96 0 310 C-0.33 310 -0.66 310 -1 310 C-1.0228717 270.94108116 -1.04050095 231.8821632 -1.05106533 192.82323901 C-1.05231609 188.21557404 -1.0536104 183.60790909 -1.05493164 179.00024414 C-1.05519395 178.08291234 -1.05545626 177.16558053 -1.05572652 176.2204508 C-1.06008191 161.35269786 -1.06796874 146.48494878 -1.0771528 131.61719813 C-1.08649298 116.36992657 -1.09205639 101.12265703 -1.09408849 85.87538272 C-1.09546296 76.46140009 -1.09980945 67.04742834 -1.10791647 57.63344906 C-1.11318841 51.18442423 -1.11480327 44.73540506 -1.11350138 38.28637823 C-1.11285871 34.56153397 -1.11386759 30.8367088 -1.11920547 27.1118679 C-1.12494168 23.07978957 -1.12299697 19.04775223 -1.12025452 15.01567078 C-1.12316736 13.82988817 -1.1260802 12.64410557 -1.12908131 11.42239016 C-1.12709026 10.34701458 -1.12509921 9.27163899 -1.12304783 8.16367626 C-1.12342755 7.23222229 -1.12380727 6.30076832 -1.1241985 5.34108847 C-1 3 -1 3 0 0 Z"/>
+
+      <!-- cream calligraphic mark — clean, no glow -->
+      <path fill="#F3E9C8"
+        transform="translate(475.656005859375,316.5458984375)"
+        d="M0 0 C1.5236968 0.00122926 3.04739587 0.00068471 4.57109165 -0.00146103 C8.60225457 -0.00235341 12.63292952 0.02060112 16.66397858 0.04898071 C20.46524872 0.07198943 24.26640821 0.07284545 28.06774902 0.07568359 C39.13906046 0.09656088 50.21028371 0.15240595 61.28149414 0.20410156 C86.05211914 0.28660156 110.82274414 0.36910156 136.34399414 0.45410156 C136.34399414 68.76410156 136.34399414 137.07410156 136.34399414 207.45410156 C144.92399414 207.45410156 153.50399414 207.45410156 162.34399414 207.45410156 C165.97399414 208.44410156 169.60399414 209.43410156 173.34399414 210.45410156 C174.64157379 213.04926086 174.22712051 214.39706329 173.82055664 217.25878906 C173.68689697 218.23001709 173.5532373 219.20124512 173.41552734 220.2019043 C173.26817139 221.23387939 173.12081543 222.26585449 172.96899414 223.32910156 C171.86553197 231.36576653 170.84913042 239.35450253 170.34399414 247.45410156 C169.02399414 247.45410156 167.70399414 247.45410156 166.34399414 247.45410156 C166.28791992 246.11605469 166.28791992 246.11605469 166.23071289 244.75097656 C166.1649707 243.58050781 166.09922852 242.41003906 166.03149414 241.20410156 C165.94448242 239.46386719 165.94448242 239.46386719 165.85571289 237.68847656 C165.30720298 234.22155896 164.93154462 232.79703068 162.34399414 230.45410156 C159.35598431 229.34642124 159.35598431 229.34642124 155.90649414 228.76660156 C154.7734082 228.53585937 153.64032227 228.30511719 152.47290039 228.06738281 C147.13825893 227.17387553 141.73391986 226.84845916 136.34399414 226.45410156 C136.35446777 227.62279785 136.36494141 228.79149414 136.37573242 229.99560547 C136.41236889 234.39775438 136.43505078 238.79989029 136.45385742 243.20214844 C136.46381681 245.09507526 136.47738921 246.9879871 136.49487305 248.88085938 C136.69983167 271.66743553 134.8591823 291.29009544 118.53149414 308.70410156 C107.97180329 318.81531134 93.63381062 324.8407524 79.03359985 324.55534363 C78.15287811 324.52765396 77.27215637 324.49996429 76.36474609 324.47143555 C74.38878984 324.42903739 72.41282177 324.38718715 70.43684387 324.34580994 C69.40193125 324.32079847 68.36701862 324.29578701 67.30074501 324.27001762 C61.764322 324.14990903 56.22711138 324.10900642 50.68969727 324.05761719 C43.66782662 323.99187249 36.64988825 323.90179381 29.63037109 323.70336914 C23.93243521 323.5444228 18.24009863 323.47994563 12.54002953 323.47712898 C10.3823731 323.45935862 8.22469868 323.40806968 6.06871986 323.32116508 C-5.61175983 322.6400448 -5.61175983 322.6400448 -15.89279556 327.29887772 C-20.02551551 331.81838263 -23.14354273 336.83503759 -26.19832802 342.11886787 C-28.41919938 345.67675527 -31.14182816 348.68026406 -34.03100586 351.70410156 C-34.52210248 352.22148927 -35.0131991 352.73887697 -35.51917744 353.27194309 C-46.87342534 365.04251738 -46.87342534 365.04251738 -53.65600586 367.45410156 C-56.54641873 367.31966375 -58.01786559 366.9603186 -60.28100586 365.16503906 C-62.79632532 362.03518133 -62.0415685 358.27812447 -61.65600586 354.45410156 C-61.13914325 352.02882319 -60.45737507 349.80812363 -59.65600586 347.45410156 C-58.99600586 347.45410156 -58.33600586 347.45410156 -57.65600586 347.45410156 C-56.66600586 352.40410156 -56.66600586 352.40410156 -55.65600586 357.45410156 C-52.48899366 358.02253965 -50.35638257 357.87117983 -47.57006836 356.21191406 C-45.16993383 354.38444321 -42.907562 352.46173912 -40.65600586 350.45410156 C-39.94444336 349.83664062 -39.23288086 349.21917969 -38.49975586 348.58300781 C-33.33785459 343.78580608 -29.36197827 338.39422255 -25.36303711 332.63378906 C-24.81184204 331.84609131 -24.26064697 331.05839355 -23.69274902 330.24682617 C-22.34386959 328.31818446 -20.99840043 326.38725982 -19.65600586 324.45410156 C-20.46144836 324.46298401 -21.26689087 324.47186646 -22.09674072 324.48101807 C-29.68899131 324.56118161 -37.28103658 324.62207454 -44.87360001 324.66135025 C-48.77700104 324.68222125 -52.68005225 324.71052913 -56.58325195 324.75585938 C-60.35042506 324.79933584 -64.11726181 324.82324234 -67.88466644 324.83361053 C-69.32161505 324.8409988 -70.75854533 324.85542663 -72.19535065 324.87702179 C-74.20842011 324.90607359 -76.22182839 324.90773561 -78.23510742 324.90820312 C-79.38094299 324.91708557 -80.52677856 324.92596802 -81.70733643 324.93511963 C-85.30231311 324.3486691 -86.46732915 323.31138807 -88.65600586 320.45410156 C-89.15600586 317.95410156 -89.15600586 317.95410156 -88.65600586 315.45410156 C-86.39761208 312.43947057 -85.20395476 311.54257037 -81.44158936 310.93511963 C-80.17139954 310.92623718 -78.90120972 310.91735474 -77.5925293 310.90820312 C-76.88968811 310.89786545 -76.18684692 310.88752777 -75.46270752 310.87687683 C-73.14669804 310.84745129 -70.83156256 310.84594981 -68.51538086 310.84472656 C-66.90682305 310.82974463 -65.29828063 310.81301745 -63.6897583 310.7946167 C-59.46145928 310.75093192 -55.23336776 310.73094176 -51.00488281 310.71588135 C-46.68794479 310.6963142 -42.37123099 310.6543438 -38.05444336 310.61425781 C-29.58835618 310.53894356 -21.12235703 310.48865966 -12.65600586 310.45410156 C-5.4707581 295.94270024 -5.4707581 295.94270024 0.09399414 280.76660156 C0.37073975 279.86707764 0.64748535 278.96755371 0.93261719 278.04077148 C2.97517812 271.18364479 4.65550089 264.26089152 6.15649414 257.26660156 C6.35146484 256.36659424 6.54643555 255.46658691 6.74731445 254.53930664 C9.90951608 238.81613746 10.72639626 222.9524933 10.65649414 206.95410156 C10.65375992 205.63283768 10.65375992 205.63283768 10.65097046 204.28488159 C10.57667777 182.67200133 8.75554044 161.38559812 6.03149414 139.95800781 C5.57158456 136.33190286 5.11283064 132.70565804 4.65649414 129.07910156 C4.54454712 128.19022247 4.4326001 127.30134338 4.31726074 126.38552856 C1.00985501 99.76529473 -2.15796619 70.99630898 15.34399414 48.45410156 C20.71469334 41.87524886 26.43203238 36.38888277 33.34399414 31.45410156 C33.34399414 34.86291173 32.54964333 36.31071644 31.03149414 39.32910156 C24.68733905 52.89804518 24.13783693 67.24641824 24.15649414 81.95410156 C24.15643372 82.68375122 24.15637329 83.41340088 24.15631104 84.16516113 C24.17178839 97.34682621 24.97202909 110.34213574 26.34399414 123.45410156 C31.43875852 174.65512616 32.80305156 227.79061476 13.48071289 276.42675781 C12.22682062 279.22720842 12.22682062 279.22720842 12.34399414 281.45410156 C12.80805664 280.84566406 13.27211914 280.23722656 13.75024414 279.61035156 C24.61815965 265.82269756 37.19492953 253.81728822 51.34399414 243.45410156 C52.21411133 242.81214844 53.08422852 242.17019531 53.98071289 241.50878906 C71.93678413 228.61280231 99.64618862 210.45410156 122.34399414 210.45410156 C122.01399414 153.03410156 121.68399414 95.61410156 121.34399414 36.45410156 C119.36399414 40.41410156 117.38399414 44.37410156 115.34399414 48.45410156 C113.07601351 51.62071603 110.86469414 54.51847152 108.34399414 57.45410156 C107.67625977 58.26621094 107.00852539 59.07832031 106.32055664 59.91503906 C91.12619881 77.74235421 69.54168843 88.28355707 46.34399414 90.45410156 C39.06359915 90.8246837 32.22365167 91.07492348 25.34399414 88.45410156 C28.85977732 86.11024611 31.95659329 85.74596276 36.03149414 85.14160156 C64.26581589 80.49472163 88.29086583 66.42815436 105.15649414 43.14160156 C110.86431937 34.52797439 115.13243339 25.2693535 118.34399414 15.45410156 C101.48827432 15.36038308 84.63263659 15.28998828 67.77671528 15.24685287 C59.94903633 15.22628604 52.1215199 15.19827898 44.29394531 15.15234375 C37.46611625 15.11229474 30.63840497 15.08662609 23.8104617 15.07774758 C20.19987625 15.07256314 16.58962757 15.06050312 12.97915077 15.03118134 C8.93435783 14.99860317 4.8901388 14.99815361 0.84521484 15 C-0.33299332 14.9856189 -1.51120148 14.97123779 -2.72511292 14.9564209 C-15.5560614 15.01940762 -27.92855374 18.57349351 -37.65209961 27.23144531 C-46.88574449 36.94166542 -49.97167162 49.43443082 -49.91429138 62.46258545 C-49.91796709 63.4425676 -49.92164279 64.42254975 -49.92542988 65.43222833 C-49.93537378 68.70096629 -49.93126631 71.96953294 -49.92724609 75.23828125 C-49.93163503 77.58762289 -49.9369378 79.93696297 -49.94308472 82.28630066 C-49.95456966 87.33737896 -49.96004301 92.38841539 -49.96096611 97.43950653 C-49.96274351 104.74678895 -49.97742976 112.05400475 -49.99646128 119.36125854 C-50.02726244 131.22406528 -50.05144887 143.08687394 -50.06933594 154.94970703 C-50.07040862 155.65889071 -50.0714813 156.36807438 -50.07258648 157.09874848 C-50.08441576 165.01730766 -50.09462162 172.9358676 -50.10302734 180.85443115 C-50.10610162 183.72961428 -50.10919034 186.60479739 -50.11230469 189.47998047 C-50.11307003 190.18950901 -50.11383537 190.89903755 -50.1146239 191.63006696 C-50.12769869 203.45482149 -50.15232445 215.27952053 -50.18604809 227.10423398 C-50.20815185 235.04455492 -50.21587823 242.98475891 -50.21365535 250.92511034 C-50.21531783 255.85613996 -50.22933936 260.78707656 -50.24686813 265.71807289 C-50.2524839 268.00944914 -50.25293803 270.30084455 -50.24793053 272.59222221 C-50.24182403 275.71287998 -50.25395757 278.83294612 -50.27073669 281.95355225 C-50.26452488 282.86638057 -50.25831306 283.77920888 -50.25191301 284.71969867 C-50.3120106 290.82627773 -50.3120106 290.82627773 -52.05899143 294.01468277 C-54.03060688 295.79173643 -55.02370385 295.99398493 -57.65600586 295.95410156 C-58.67694336 295.96957031 -58.67694336 295.96957031 -59.71850586 295.98535156 C-61.65600586 295.45410156 -61.65600586 295.45410156 -63.25286961 294.02165031 C-65.41384806 290.06735327 -65.07253892 286.27944585 -65.04368591 281.84207153 C-65.04907145 280.85622853 -65.05445699 279.87038553 -65.06000572 278.8546685 C-65.07434638 275.54149554 -65.06716622 272.2287187 -65.06005859 268.91552734 C-65.06575928 266.54359108 -65.07272237 264.17165756 -65.08085632 261.79972839 C-65.09697444 256.01763697 -65.09887915 250.23567029 -65.09364342 244.45356114 C-65.08960087 239.74886431 -65.09104631 235.04419954 -65.09639168 230.33950424 C-65.0971401 229.66967554 -65.09788852 228.99984684 -65.09865962 228.3097203 C-65.10019115 226.94881567 -65.1017295 225.58791104 -65.10327459 224.22700642 C-65.11700985 211.4567797 -65.111557 198.68661419 -65.10008938 185.91638885 C-65.09017788 174.25719283 -65.10305962 162.59815599 -65.12702357 150.93898453 C-65.15147054 138.95386226 -65.16100738 126.96881394 -65.15437084 114.98366725 C-65.15088818 108.26061607 -65.15338427 101.53770487 -65.17062187 94.81467056 C-65.18614543 88.48300466 -65.18207517 82.15164056 -65.16331673 75.81998634 C-65.15964456 73.50378157 -65.16269895 71.18755419 -65.17320251 68.87137032 C-65.25805545 48.60181986 -63.03602801 32.04875035 -48.46850586 16.64160156 C-34.45785848 3.4125005 -18.74239275 -0.20160108 0 0 Z"/>
+
+      <!-- inner fill matches vessel background — blends junction closed -->
+      <path fill="#141f33"
+        transform="translate(598,545)"
+        d="M0 0 C0.07486735 5.61927468 0.12893696 11.2382509 0.16479492 16.85791016 C0.17976338 18.76453721 0.20014546 20.67113055 0.22631836 22.57763672 C0.47624101 41.26793039 -1.28466954 55.60212002 -14.55859375 69.70703125 C-25.16223869 79.66597458 -39.79722289 83.18393601 -54.02490234 83.11352539 C-54.80606415 83.11367142 -55.58722595 83.11381744 -56.39205933 83.1139679 C-58.9567143 83.11327498 -61.52129532 83.10551184 -64.0859375 83.09765625 C-65.87098145 83.09578986 -67.65602591 83.094367 -69.44107056 83.09336853 C-74.12637765 83.08956075 -78.81165346 83.07974538 -83.49694824 83.06866455 C-88.28311744 83.05841297 -93.06929172 83.05386289 -97.85546875 83.04882812 C-107.23699287 83.03812149 -116.61849383 83.02106604 -126 83 C-113.71100143 64.38147532 -96.98402777 48.10249996 -79 35 C-77.83822062 34.13193993 -76.67676588 33.26344521 -75.515625 32.39453125 C-55.72830924 17.7487798 -25.32967725 0 0 0 Z"/>
+
+    </svg>
+  </div>
+</div>
+
+<!-- Return splash -->
+<div id="lorenSplash" style="display:none">
+  <div class="splash-greeting" id="splashGreeting"></div>
+  <div class="splash-dot"></div>
+  <div class="splash-quote" id="splashQuote"></div>
+  <div class="splash-attr" id="splashAttr"></div>
+  <div class="splash-translation" id="splashTranslation"></div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const firstSplash = document.getElementById("lorenInitialSplash");
+
+  // First splash in
+  firstSplash.style.display = "flex";
+
+  // At 2.8s — fade first splash out in sync with showReturnSplash
+  setTimeout(() => {
+    firstSplash.classList.add("fade-out");
+  }, 2800);
+  
+  // At 3.6s — fully remove first splash
+  setTimeout(() => {
+    firstSplash.style.display = "none";
+    // Let the topbar greeting reveal now if nothing else (e.g. the quote
+    // splash) is covering it — see _wireTopbarOverflow / _revealTopbarGreetingNow.
+    if (typeof window._revealTopbarGreetingNow === 'function') window._revealTopbarGreetingNow();
+  }, 3000);
+
+  // Start loading the intent classifier in the background
+  // Runs in a Worker — never blocks the UI
+  _warmUpClassifier();
+
+});
+</script>
+
+<script>
+// ── Service Worker Registration ──────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg => console.log('[SW] Registered:', reg.scope))
+    .catch(() => {});
+}
+</script>
+
+<!-- Search overlay — ink-flow loader for heavy operations -->
+<div id="searchOverlay" class="search-overlay hidden">
+  <div class="search-overlay-inner">
+    <div class="ink-loader">
+      <div class="ink-track">
+        <div class="ink-flow"></div>
+      </div>
+    </div>
+    <div class="search-text">Searching…</div>
+  </div>
+</div>
+
+<!-- Pre-created so CSS transition is active on first theme change -->
+<div id="themeOverlay"></div>
+
+</body>
+</html>
